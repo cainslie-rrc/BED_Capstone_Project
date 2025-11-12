@@ -3,10 +3,9 @@
  */
 export interface Stem {
     id: string;
-    audio: string;
+    audioFile: string;
     user: string;
     name: string;
-    createdByUser: string;
     createdAt: Date;
     updatedAt: Date;
 }

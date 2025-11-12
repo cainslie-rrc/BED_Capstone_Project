@@ -13,21 +13,34 @@ import {
 
 const COLLECTION: string = "comments";
 
+/**
+ * Creates a new comment
+ * @param commentData - The data for the new comment (id, user, comment, createdAt)
+ * @returns The created comment
+ */
 export const createComment = async (commentData: {
     user: string;
     comment: string;
 }): Promise<Comment> => {
-    const dateNow = new Date();
-    const newComment: Partial<Comment> = {
-        ...commentData,
-        createdAt: dateNow,
-    };
+    try {
+        const dateNow = new Date();
+        const newComment: Partial<Comment> = {
+            ...commentData,
+            createdAt: dateNow,
+        };
 
-    const commentId: string = await createDocument<Comment>(COLLECTION, newComment);
+        const commentId: string = await createDocument<Comment>(COLLECTION, newComment);
 
-    return structuredClone({ id: commentId, ...newComment } as Comment);
+        return structuredClone({ id: commentId, ...newComment } as Comment);
+    } catch (error: unknown) {
+        throw error;
+    }
 };
 
+/**
+ * Retrieves all comments from storage
+ * @returns Array of all comments
+ */
 export const getAllComments = async (): Promise<Comment[]> => {
     try {
         const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
@@ -45,27 +58,43 @@ export const getAllComments = async (): Promise<Comment[]> => {
     }
 };
 
+/**
+ * Retrieves an comment by ID
+ * @param id the ID of the comment to retrieve
+ * @returns The comment with the specified ID
+ */
 export const getCommentById = async (id: string): Promise<Comment> => {
-    const doc: DocumentSnapshot | null = await getDocumentById(COLLECTION, id);
+    try {
+        const doc: DocumentSnapshot | null = await getDocumentById(COLLECTION, id);
 
-    if (!doc) {
-        throw new Error(`Comment with ID ${id} not found.`);
+        if (!doc) {
+            throw new Error(`Comment with ID ${id} not found.`);
+        }
+
+        const data: DocumentData | undefined = doc.data();
+        const comment: Comment = {
+            id: doc.id,
+            ...data,
+        } as Comment;
+
+        return structuredClone(comment);
+    } catch (error: unknown) {
+        throw error;
     }
-
-    const data: DocumentData | undefined = doc.data();
-    const comment: Comment = {
-        id: doc.id,
-        ...data,
-    } as Comment;
-
-    return structuredClone(comment);
 };
-
+/** 
+ * Deletes an comment by ID
+ * @param id the ID of the comment to delete
+ */
 export const deleteComment = async (id: string): Promise<void> => {
-    const comment: Comment = await getCommentById(id);
-    if (!comment) {
-        throw new Error(`Comment with ID ${id} not found.`)
-    }
+    try {
+        const comment: Comment = await getCommentById(id);
+        if (!comment) {
+            throw new Error(`Comment with ID ${id} not found.`)
+        }
 
-    await deleteDocument(COLLECTION, id);
-}
+        await deleteDocument(COLLECTION, id);
+    } catch (error: unknown) {
+        throw error;
+    }
+};
