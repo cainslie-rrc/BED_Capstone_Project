@@ -23,7 +23,7 @@ export const createComment = async (
             comment
         });
         res.status(HTTP_STATUS.CREATED).json(
-            successResponse(newComment, "Comment created successfully")
+            successResponse(newComment, "Comment created successfully.")
         );
     } catch (error: unknown) {
         next(error);

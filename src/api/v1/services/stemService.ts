@@ -14,12 +14,10 @@ import {
 
 const COLLECTION: string = "stems";
 
-export const createStems = async (stemData: {
-    id: string;
+export const createStem = async (stemData: {
     audio: string;
     user: string;
     name: string;
-    createdByUser: string;
 
 }): Promise<Stem> => {
     try {
@@ -79,7 +77,7 @@ export const getAllStems = async (): Promise<Stem[]> => {
 
 export const updateStem = async (
     id: string,
-    stemData: Pick<Stem, "audioFile" | "user">
+    stemData: Pick<Stem, "audio" | "user">
 ): Promise<Stem> => {
     try {
         const stem: Stem = await getStemById(id);
@@ -92,8 +90,8 @@ export const updateStem = async (
             updatedAt: new Date(),
         };
 
-        if (stemData.audioFile !== undefined) 
-            updateStem.audioFile = stemData.audioFile;
+        if (stemData.audio !== undefined) 
+            updateStem.audio = stemData.audio;
         if (stemData.user !== undefined)
             updateStem.user = stemData.user;
 
