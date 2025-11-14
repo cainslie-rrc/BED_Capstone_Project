@@ -18,13 +18,14 @@ export const createStem = async (stemData: {
     audio: string;
     user: string;
     name: string;
-
+    trackId: string;
 }): Promise<Stem> => {
     try {
         const dateNow = new Date();
         const newStem: Partial<Stem> = {
         ...stemData,
         createdAt: dateNow,
+        updatedAt: dateNow,
         };
 
         const stemId: string = await createDocument<Stem>(COLLECTION, newStem)
@@ -66,6 +67,8 @@ export const getAllStems = async (): Promise<Stem[]> => {
             return {
                 id: doc.id,
                 ...data,
+                createdAt: data.createdAt.toDate(),
+                updatedAt: data.updatedAt.toDate(),
             } as Stem;
         });
 

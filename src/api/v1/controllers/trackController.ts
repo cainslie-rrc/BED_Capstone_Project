@@ -1,31 +1,31 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS } from "../../../constants/httpConstants";
-import * as stemService from "../services/stemService";
-import { Stem } from "../models/stemModel";
+import * as trackService from "../services/trackService";
+import { Track } from "../models/trackModel";
 import { successResponse } from "../models/responseModel";
 
 /**
- * Manages requests and responses to create one new Stem file
+ * Manages requests and responses to create a new Track
  * @param req - The express Request
  * @param res  - The express Response
  * @param next - The express middleware chaining function
  */
-export const createStem = async (
+export const createTrack = async (
     req: Request,
     res: Response,
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { audio, user, name, trackId } = req.body;
+        const { user, audio, name, genre } = req.body;
 
-        const newStem: Stem = await stemService.createStem({
-            audio,
+        const newTrack: Track = await trackService.createTrack({
             user,
+            audio,
             name,
-            trackId,
+            genre,
         });
         res.status(HTTP_STATUS.CREATED).json(
-            successResponse(newStem, "Stem created successfully.")
+            successResponse(newTrack, "Track created successfully.")
         );
     } catch (error: unknown) {
         next(error);
@@ -33,20 +33,20 @@ export const createStem = async (
 };
 
 /**
- * Manages requests and responses to retrieve all Stems
+ * Manages requests and responses to retrieve all Tracks
  * @param req - The express Request
  * @param res  - The express Response
  * @param next - The express middleware chaining function
  */
-export const getAllStems = async (
+export const getAllTracks = async (
     req: Request,
     res: Response,
     next: NextFunction
 ): Promise<void> => {
     try {
-        const stems: Stem[] = await stemService.getAllStems();
+        const tracks: Track[] = await trackService.getAllTracks();
         res.status(HTTP_STATUS.OK).json(
-            successResponse(stems, "Stems successfully retrieved.")
+            successResponse(tracks, "Tracks successfully")
         );
     } catch (error: unknown) {
         next(error);
@@ -54,12 +54,12 @@ export const getAllStems = async (
 };
 
 /**
- * Manages requests and responses to retrieve one of the Stems by ID
+ * Manages requests and responses to retrieve one Track by ID
  * @param req - The express Request
  * @param res  - The express Response
  * @param next - The express middleware chaining function
  */
-export const getStemById = async (
+export const getTrackById = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -67,10 +67,10 @@ export const getStemById = async (
         try {
         const id: string = req.params.id;
 
-        const selectedStem: Stem = await stemService.getStemById(id);
+        const selectedTrack: Track = await trackService.getTrackById(id);
 
         res.status(HTTP_STATUS.OK).json(
-            successResponse(selectedStem, "Stem retrieved successfully.")
+            successResponse(selectedTrack, "Track retrieved successfully.")
         );
     } catch (error: unknown) {
         next(error);
@@ -78,31 +78,26 @@ export const getStemById = async (
 };
 
 /**
- * Manages requests and responses to update one of the Stems
+ * Manages requests and responses to update a Track
  * @param req - The express Request
  * @param res  - The express Response
  * @param next - The express middleware chaining function
  */
-export const updateStem = async (
+export const updateTrack = async (
     req: Request,
     res: Response,
     next: NextFunction
 ): Promise<void> => {
     try {
-        // const id: string = req.params.id;
         const { id } = req.params;
+        const { audio } = req.body;
 
-        // Extract update fields
-        const { audio, user } = req.body;
-
-        // create the update item object with the fields to be updated
-        const updatedItem: Stem = await stemService.updateStem(id, {
-            audio,
-            user,
+        const updateTrack: Track = await trackService.updateTrack(id, {
+            audio
         });
 
         res.status(HTTP_STATUS.OK).json(
-            successResponse(updatedItem, "Stem updated successfully.")
+            successResponse(updateTrack, "Track updated successfully.")
         );
     } catch (error: unknown) {
         next(error);
@@ -110,12 +105,12 @@ export const updateStem = async (
 };
 
 /**
- * Manages requests and responses to delete one of the Stems
+ * Manages requests and responses to delete a Track
  * @param req - The express Request
  * @param res  - The express Response
  * @param next - The express middleware chaining function
  */
-export const deleteStem = async (
+export const deleteTrack = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -123,11 +118,11 @@ export const deleteStem = async (
     try {
         const id: string = req.params.id;
 
-        await stemService.deleteStem(id);
+        await trackService.deleteTrack(id);
         res.status(HTTP_STATUS.OK).json(
-            successResponse("Stem deleted successfully.")
+            successResponse("Track successfully deleted.")
         );
     } catch (error: unknown) {
         next(error);
     }
-};
+}

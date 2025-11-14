@@ -47,6 +47,7 @@ export const getAllComments = async (): Promise<Comment[]> => {
         const comments: Comment[] = snapshot.docs.map((doc) => {
             const data: DocumentData = doc.data();
             return {
+                id: doc.id,
                 ...data,
                 createdAt: data.createdAt.toDate(),
             } as Comment;

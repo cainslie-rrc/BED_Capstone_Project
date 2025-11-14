@@ -3,10 +3,10 @@
  */
 export interface Track {
     id: string;
-    user: string;
+    userId: string;
     audio: string;
     name: string;
-    genre: string;
+    genre: Array<"House" | "Trap" | "Dubstep" | "Hardstyle" | "Techno">;
     createdAt: Date;
     updatedAt: Date;
 }
