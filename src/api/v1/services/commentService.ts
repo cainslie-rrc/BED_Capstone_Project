@@ -63,6 +63,7 @@ export const getAllComments = async (): Promise<Comment[]> => {
  * Retrieves an comment by ID
  * @param id the ID of the comment to retrieve
  * @returns The comment with the specified ID
+ * @throws Error if comment with given ID is not found
  */
 export const getCommentById = async (id: string): Promise<Comment> => {
     try {
@@ -86,6 +87,7 @@ export const getCommentById = async (id: string): Promise<Comment> => {
 /** 
  * Deletes an comment by ID
  * @param id the ID of the comment to delete
+ * @throws Error if comment with given ID is not found
  */
 export const deleteComment = async (id: string): Promise<void> => {
     try {

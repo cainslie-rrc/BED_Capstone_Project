@@ -3,7 +3,7 @@
  */
 export interface Track {
     id: string;
-    userId: string;
+    user: string;
     audio: string;
     name: string;
     genre: Array<"House" | "Trap" | "Dubstep" | "Hardstyle" | "Techno">;

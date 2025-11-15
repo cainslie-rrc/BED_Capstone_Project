@@ -14,11 +14,16 @@ import {
 
 const COLLECTION: string = "tracks";
 
+/**
+ * Creates a new track
+ * @param itemData - The data for the new track (user, audio and name)
+ * @returns The created track with generated ID
+ */
 export const createTrack = async (trackData: {
     user: string;
     audio: string;
     name: string;
-    genre: Array<"House" | "Trap" | "Dubstep" | "Hardstyle" | "Techno">;
+    genre?: Array<"House" | "Trap" | "Dubstep" | "Hardstyle" | "Techno">;
 }): Promise<Track> => {
     try {
         const dateNow = new Date();
@@ -36,6 +41,35 @@ export const createTrack = async (trackData: {
     }
 };
 
+/**
+ * Retrieves all tracks from storage
+ * @returns Array of all tracks
+ */
+export const getAllTracks = async (): Promise<Track[]> => {
+    try {
+        const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
+        const tracks: Track[] = snapshot.docs.map((doc) => {
+            const data: DocumentData = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt.toDate(),
+                updatedAt: data.updatedAt.toDate(),
+            } as Track;
+        });
+
+        return tracks;
+    } catch (error: unknown) {
+        throw error;
+    }
+};
+
+/**
+ * Retrieves one track by ID from the database
+ * @param id - The ID of a track to retrieve 
+ * @returns The track if found
+ * @throws Error if track with given ID is not found
+ */
 export const getTrackById = async (id: string): Promise<Track> => {
     try {
         const doc: DocumentSnapshot | null = await getDocumentById(
@@ -59,25 +93,13 @@ export const getTrackById = async (id: string): Promise<Track> => {
     }
 };
 
-export const getAllTracks = async (): Promise<Track[]> => {
-    try {
-        const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
-        const tracks: Track[] = snapshot.docs.map((doc) => {
-            const data: DocumentData = doc.data();
-            return {
-                id: doc.id,
-                ...data,
-                createdAt: data.createdAt.toDate(),
-                updatedAt: data.updatedAt.toDate(),
-            } as Track;
-        });
-
-        return tracks;
-    } catch (error: unknown) {
-        throw error;
-    }
-};
-
+/**
+ * Updates (replaces) an existing track
+ * @param id - The ID of the track to update
+ * @param itemData - The fields to updates (audio)
+ * @returns The updated track
+ * @throws Error if track with given ID is not found
+ */
 export const updateTrack = async (
     id: string,
     trackData: Pick<Track, "audio">
@@ -104,6 +126,11 @@ export const updateTrack = async (
     }
 };
 
+/**
+ * Deletes an track from storage
+ * @param id - The ID of the track to delete
+ * @throws Error if track with given ID is not found
+ */
 export const deleteTrack = async (id: string): Promise<void> => {
     try {
         const track: Track = await getTrackById(id);

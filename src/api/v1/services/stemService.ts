@@ -14,6 +14,11 @@ import {
 
 const COLLECTION: string = "stems";
 
+/**
+ * Creates one new stem
+ * @param stemData - The data for one new stem (audio, user, name, trackId)
+ * @returns The created stem with generated ID
+ */
 export const createStem = async (stemData: {
     audio: string;
     user: string;
@@ -36,6 +41,35 @@ export const createStem = async (stemData: {
     }
 };
 
+/**
+ * Retrieves all stems
+ * @returns Array of all stems
+ */
+export const getAllStems = async (): Promise<Stem[]> => {
+    try {
+        const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
+        const stems: Stem[] = snapshot.docs.map((doc) => {
+            const data: DocumentData = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt.toDate(),
+                updatedAt: data.updatedAt.toDate(),
+            } as Stem;
+        });
+
+        return stems;
+    } catch (error: unknown) {
+        throw error;
+    }
+};
+
+/**
+ * Retrieves one stem by ID from the database
+ * @param id - The ID of one Stem to retrieve 
+ * @returns The stem if found
+ * @throws Error if stem with given ID is not found
+ */
 export const getStemById = async (id: string): Promise<Stem> => {
     try {
         const doc: DocumentSnapshot | null = await getDocumentById(
@@ -59,25 +93,13 @@ export const getStemById = async (id: string): Promise<Stem> => {
     }
 };
 
-export const getAllStems = async (): Promise<Stem[]> => {
-    try {
-        const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
-        const stems: Stem[] = snapshot.docs.map((doc) => {
-            const data: DocumentData = doc.data();
-            return {
-                id: doc.id,
-                ...data,
-                createdAt: data.createdAt.toDate(),
-                updatedAt: data.updatedAt.toDate(),
-            } as Stem;
-        });
-
-        return stems;
-    } catch (error: unknown) {
-        throw error;
-    }
-};
-
+/**
+ * Updates one existing stem
+ * @param id - The ID of one Stem to update
+ * @param stemData _ The fields to update (audio, user)
+ * @returns The updated stem
+ * @throws Error if stem with given ID is not found
+ */
 export const updateStem = async (
     id: string,
     stemData: Pick<Stem, "audio" | "user">
@@ -106,6 +128,11 @@ export const updateStem = async (
     }
 };
 
+/**
+ * Deletes an on of the stems from storage
+ * @param id - The ID of one of the Stems to delete
+ * @throws Error if stem with given ID is not found
+ */
 export const deleteStem = async (id: string): Promise<void> => {
     try {
         const stem: Stem = await getStemById(id);

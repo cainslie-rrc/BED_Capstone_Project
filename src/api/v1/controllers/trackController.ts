@@ -125,4 +125,4 @@ export const deleteTrack = async (
     } catch (error: unknown) {
         next(error);
     }
-}
+};
