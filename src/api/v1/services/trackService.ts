@@ -26,7 +26,7 @@ export const createTrack = async (trackData: {
     genre?: Array<"House" | "Trap" | "Dubstep" | "Hardstyle" | "Techno">;
 }): Promise<Track> => {
     try {
-        const dateNow = new Date();
+        const dateNow = new Date().toISOString();
         const newTrack: Partial<Track> = {
         ...trackData,
         createdAt: dateNow,
@@ -53,8 +53,8 @@ export const getAllTracks = async (): Promise<Track[]> => {
             return {
                 id: doc.id,
                 ...data,
-                createdAt: data.createdAt.toDate(),
-                updatedAt: data.updatedAt.toDate(),
+                createdAt: data.createdAt,
+                updatedAt: data.updatedAt,
             } as Track;
         });
 
@@ -112,7 +112,7 @@ export const updateTrack = async (
 
         const updateTrack: Track = {
             ...track,
-            updatedAt: new Date(),
+            updatedAt: new Date().toISOString(),
         };
 
         if (trackData.audio !== undefined) 

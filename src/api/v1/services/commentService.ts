@@ -49,7 +49,10 @@ export const getAllComments = async (): Promise<Comment[]> => {
             return {
                 id: doc.id,
                 ...data,
-                createdAt: data.createdAt.toDate(),
+                createdAt:
+                    data.createdAt instanceof Date
+                        ? data.createdAt
+                        : data.createdAt.toDate(),
             } as Comment;
         });
 

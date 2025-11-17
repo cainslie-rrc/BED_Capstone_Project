@@ -89,16 +89,13 @@ export const updateStem = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        // const id: string = req.params.id;
         const { id } = req.params;
+        const { audio, user, name } = req.body;
 
-        // Extract update fields
-        const { audio, user } = req.body;
-
-        // create the update item object with the fields to be updated
         const updatedItem: Stem = await stemService.updateStem(id, {
             audio,
             user,
+            name, 
         });
 
         res.status(HTTP_STATUS.OK).json(

@@ -6,7 +6,7 @@ export interface Track {
     user: string;
     audio: string;
     name: string;
-    genre: Array<"House" | "Trap" | "Dubstep" | "Hardstyle" | "Techno">;
-    createdAt: Date;
-    updatedAt: Date;
+    genre?: Array<"House" | "Trap" | "Dubstep" | "Hardstyle" | "Techno">;
+    createdAt: string;
+    updatedAt: string;
 }

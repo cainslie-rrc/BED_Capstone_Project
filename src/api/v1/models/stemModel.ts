@@ -7,6 +7,6 @@ export interface Stem {
     user: string;
     name: string;
     trackId: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
 }

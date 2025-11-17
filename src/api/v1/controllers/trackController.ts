@@ -46,7 +46,7 @@ export const getAllTracks = async (
     try {
         const tracks: Track[] = await trackService.getAllTracks();
         res.status(HTTP_STATUS.OK).json(
-            successResponse(tracks, "Tracks successfully")
+            successResponse(tracks, "Tracks successfully retrieved.")
         );
     } catch (error: unknown) {
         next(error);
@@ -120,7 +120,7 @@ export const deleteTrack = async (
 
         await trackService.deleteTrack(id);
         res.status(HTTP_STATUS.OK).json(
-            successResponse("Track successfully deleted.")
+            successResponse("Track deleted successfully.")
         );
     } catch (error: unknown) {
         next(error);

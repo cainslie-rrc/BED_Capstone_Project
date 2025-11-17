@@ -44,7 +44,7 @@ export const getAllComments = async (
     try {
         const comments: Comment[] = await commentService.getAllComments();
         res.status(HTTP_STATUS.OK).json(
-            successResponse(comments, "Comment successfully retrieved.")
+            successResponse(comments, "Comments retrieved successfully.")
         );
     } catch (error: unknown) {
         next(error);

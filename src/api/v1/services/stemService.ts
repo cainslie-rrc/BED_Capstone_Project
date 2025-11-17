@@ -26,7 +26,7 @@ export const createStem = async (stemData: {
     trackId: string;
 }): Promise<Stem> => {
     try {
-        const dateNow = new Date();
+        const dateNow = new Date().toISOString();
         const newStem: Partial<Stem> = {
         ...stemData,
         createdAt: dateNow,
@@ -53,8 +53,8 @@ export const getAllStems = async (): Promise<Stem[]> => {
             return {
                 id: doc.id,
                 ...data,
-                createdAt: data.createdAt.toDate(),
-                updatedAt: data.updatedAt.toDate(),
+                createdAt: data.createdAt,
+                updatedAt: data.updatedAt,
             } as Stem;
         });
 
@@ -102,7 +102,7 @@ export const getStemById = async (id: string): Promise<Stem> => {
  */
 export const updateStem = async (
     id: string,
-    stemData: Pick<Stem, "audio" | "user">
+    stemData: Pick<Stem, "audio" | "user" | "name">
 ): Promise<Stem> => {
     try {
         const stem: Stem = await getStemById(id);
@@ -112,17 +112,19 @@ export const updateStem = async (
 
         const updateStem: Stem = {
             ...stem,
-            updatedAt: new Date(),
+            updatedAt: new Date().toISOString(),
         };
 
         if (stemData.audio !== undefined) 
             updateStem.audio = stemData.audio;
         if (stemData.user !== undefined)
             updateStem.user = stemData.user;
+        if (stemData.name !== undefined)
+            updateStem.name = stemData.name;
 
         await updateDocument<Stem>(COLLECTION, id, updateStem);
 
-        return structuredClone(updateStem)
+        return structuredClone(updateStem);
     } catch (error: unknown) {
         throw error;
     }
