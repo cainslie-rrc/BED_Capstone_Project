@@ -1,2 +1,11 @@
 node_modules/
 dist/
+
+.vscode/
+.env
+
+capstone-project-438aa-firebase-adminsdk-fbsvc-909a2ff48f.json
+
+logs/
+
+openapi.json
