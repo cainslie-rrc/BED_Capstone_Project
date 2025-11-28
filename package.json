@@ -7,7 +7,6 @@
     "start": "ts-node src/server.ts",
     "test": "jest",
     "generate-docs": "ts-node scripts/generate-openapi.ts && npx @redocly/cli build-docs openapi.json --output docs/index.html"
-
   },
   "repository": {
     "type": "git",
@@ -40,6 +39,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "firebase-admin": "^13.5.0",
+    "joi": "^18.0.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   }

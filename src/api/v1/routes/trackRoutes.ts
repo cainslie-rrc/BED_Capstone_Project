@@ -1,5 +1,9 @@
 import express, { Router } from "express";
+import { validateRequest } from "../middleware/validate";
 import * as trackController from "../controllers/trackController";
+import authenticate from "../middleware/authenticate";
+import isAuthorized from "../middleware/authorize";
+import { AuthorizationOptions } from "../models/authorizationOptions";
 
 const router: Router = express.Router();
 
@@ -45,7 +49,11 @@ const router: Router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/Track'
  */
-router.post("/", trackController.createTrack);
+router.post(
+    "/", 
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user"] } as AuthorizationOptions),
+    trackController.createTrack);
 
 /**
  * @openapi
@@ -90,7 +98,11 @@ router.get("/", trackController.getAllTracks);
  *             schema:
  *               $ref: '#/components/schemas/Track'
  */
-router.get("/:id", trackController.getTrackById);
+router.get(
+    "/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user", "user-with-access"] } as AuthorizationOptions),
+    trackController.getTrackById);
 
 /**
  * @openapi
@@ -141,7 +153,11 @@ router.get("/:id", trackController.getTrackById);
  *             schema:
  *               $ref: '#/components/schemas/Track'
  */
-router.put("/:id", trackController.updateTrack);
+router.put(
+    "/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user", "user-with-access"] } as AuthorizationOptions),
+    trackController.updateTrack);
 
 /**
  * @openapi
@@ -162,6 +178,9 @@ router.put("/:id", trackController.updateTrack);
  *       200:
  *         description: Track deleted successfully
  */
-router.delete("/:id", trackController.deleteTrack);
+router.delete("/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user"] } as AuthorizationOptions),
+    trackController.deleteTrack);
 
 export default router;
