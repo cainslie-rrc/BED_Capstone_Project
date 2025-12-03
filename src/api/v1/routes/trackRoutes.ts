@@ -1,4 +1,5 @@
 import express, { Router } from "express";
+import { upload } from "../../../../config/multerConfig";
 import * as trackController from "../controllers/trackController";
 
 const router: Router = express.Router();
@@ -91,6 +92,12 @@ router.get("/", trackController.getAllTracks);
  *               $ref: '#/components/schemas/Track'
  */
 router.get("/:id", trackController.getTrackById);
+
+router.put(
+    "/:id/audio",
+    upload.single("audio"),
+    trackController.uploadAudioToTrack
+)
 
 /**
  * @openapi

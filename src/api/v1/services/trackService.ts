@@ -11,6 +11,8 @@ import {
     updateDocument,
     deleteDocument,
 } from "../repositories/firestoreRepository";
+import fs from "fs";
+import path from "path";
 
 const COLLECTION: string = "tracks";
 
@@ -21,11 +23,11 @@ const COLLECTION: string = "tracks";
  */
 export const createTrack = async (trackData: {
     user: string;
-    audio: string;
     name: string;
+    audio: string;
     genre?: Array<"House" | "Trap" | "Dubstep" | "Hardstyle" | "Techno">;
 }): Promise<Track> => {
-    try {
+    try {       
         const dateNow = new Date().toISOString();
         const newTrack: Partial<Track> = {
         ...trackData,
@@ -93,6 +95,33 @@ export const getTrackById = async (id: string): Promise<Track> => {
     }
 };
 
+export const uploadAudioToTrack = async (
+    id: string,
+    trackData: Pick<Track, "audio">
+): Promise<Track> => {
+    try {
+        const track: Track = await getTrackById(id);
+        if (!track) {
+            throw new Error(`The track with ID ${id} not found.`);
+        }
+
+        const uploadAudioToTrack: Track = {
+            ...track,
+            updatedAt: new Date().toISOString(),
+        };
+
+        if (trackData.audio !== undefined)
+            uploadAudioToTrack.audio = trackData.audio
+
+        await updateDocument<Track>(COLLECTION, id, uploadAudioToTrack);
+
+        return structuredClone(uploadAudioToTrack)
+
+    } catch (error: unknown) {
+        throw error;
+    }
+};
+
 /**
  * Updates (replaces) an existing track
  * @param id - The ID of the track to update
@@ -102,7 +131,7 @@ export const getTrackById = async (id: string): Promise<Track> => {
  */
 export const updateTrack = async (
     id: string,
-    trackData: Pick<Track, "audio">
+    trackData: Pick<Track, "name">
 ): Promise<Track> => {
     try {
         const track: Track = await getTrackById(id);
@@ -115,8 +144,8 @@ export const updateTrack = async (
             updatedAt: new Date().toISOString(),
         };
 
-        if (trackData.audio !== undefined) 
-            updateTrack.audio = trackData.audio;
+        if (trackData.name !== undefined)
+            updateTrack.name = trackData.name;
 
         await updateDocument<Track>(COLLECTION, id, updateTrack);
 
@@ -139,6 +168,27 @@ export const deleteTrack = async (id: string): Promise<void> => {
         }
 
         await deleteDocument(COLLECTION, id);
+    } catch (error: unknown) {
+        throw error;
+    }
+};
+
+export const deleteTrackAudio = async (id: string): Promise<void> => {
+    try {
+        const track: Track = await getTrackById(id);
+        if (!track) {
+            throw new Error(`Track with ID ${id} not found.`);
+        }
+
+        const uploadPath = path.join(process.cwd(), "uploads");
+        
+        const files = fs.readdirSync(uploadPath);
+        for (const file of files) {
+            if (file.startsWith(id + '-')) {
+                const filePath = path.join(uploadPath, file)
+                fs.unlinkSync(filePath)
+            }
+        }
     } catch (error: unknown) {
         throw error;
     }
