@@ -7,6 +7,7 @@ jest.mock("../src/api/v1/controllers/stemController", () => ({
     createStem: jest.fn((req, res) => res.status(HTTP_STATUS.CREATED).send()),
     getAllStems: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
     getStemById: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
+    uploadAudioToStem: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
     updateStem: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
     deleteStem: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
 }));
@@ -20,7 +21,6 @@ describe("Stem Routes", () => {
         it("should call createStem controller with valid data", async () => {
             const mockStem = {
                 id: "Test Id",
-                audio: "Test Audio",
                 user: "Test User",
                 name: "Test Name",
                 trackId: "Test TrackId",
@@ -47,10 +47,20 @@ describe("Stem Routes", () => {
         });
     });
 
+    describe("PUT /api/v1/stems/:id/audio", () => {
+        it("should call uploadAudioToStem controller with valid data", async () => {
+            const mockStem = {
+                audio: "uploads/stems/test_audio.mp3",
+            };
+
+            await request(app).put("/api/v1/stems/1/audio").send(mockStem);
+            expect(stemController.uploadAudioToStem).toHaveBeenCalled();
+        });
+    });
+
     describe("PUT /api/v1/stems/:id", () => {
         it("should call updateStem controller with valid data", async () => {
             const mockStem = {
-                audio: "Test Audio",
                 user: "Test User",
                 name: "Test Name",
             };

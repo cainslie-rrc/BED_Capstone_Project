@@ -1,57 +1,57 @@
-import * as stemService from "../src/api/v1/services/stemService";
+import * as trackService from "../src/api/v1/services/trackService";
 import * as firestoreRepository from "../src/api/v1/repositories/firestoreRepository";
-import { Stem } from "../src/api/v1/models/stemModel";
+import { Track } from "../src/api/v1/models/trackModel";
 
 // Mock the repository module
 // jest.mock replaces the entire module with an auto-mocked version
 jest.mock("../src/api/v1/repositories/firestoreRepository");
 
-describe("Stem Service", () => {
+describe("Track Service", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it("should create a stem successfully", async () => {
+    it("should create a track successfully", async () => {
         // Arrange
-        const mockStemData: {
+        const mockTrackData: {
             audio: string;
             user: string;
             name: string;
-            trackId: string;
+            genre: Array<"House" | "Trap" | "Dubstep" | "Hardstyle" | "Techno">;
         } = {
             audio: "Test Audio",
             user: "Test User",
             name: "Test Name",
-            trackId: "Test ID"
+            genre: ["Trap"],
         };
-        const mockDocumentId: string = "test-stem-id";
+        const mockDocumentId: string = "test-track-id";
 
         (firestoreRepository.createDocument as jest.Mock).mockResolvedValue(
             mockDocumentId
         );
 
         // Act
-        const result: Stem = await stemService.createStem(mockStemData);
+        const result: Track = await trackService.createTrack(mockTrackData);
 
         // Assert
         expect(firestoreRepository.createDocument).toHaveBeenCalledWith(
-            "stems",
+            "tracks",
             expect.objectContaining({
-                audio: mockStemData.audio,
-                user: mockStemData.user,
-                name: mockStemData.name,
-                trackId: mockStemData.trackId,
+                audio: mockTrackData.audio,
+                user: mockTrackData.user,
+                name: mockTrackData.name,
+                genre: mockTrackData.genre,
                 createdAt: expect.any(String),
                 updatedAt: expect.any(String),
             })
         );
         expect(result.id).toBe(mockDocumentId);
-        expect(result.user).toBe(mockStemData.user);
-        expect(result.name).toBe(mockStemData.name);
-        expect(result.trackId).toBe(mockStemData.trackId);
+        expect(result.user).toBe(mockTrackData.user);
+        expect(result.name).toBe(mockTrackData.name);
+        expect(result.genre).toEqual(mockTrackData.genre);
     });
 
-    it("should retrieve all stems successfully", async () => {
+    it("should retrieve all tracks successfully", async () => {
         // Arrange
         const mockDocuments = [
             {
@@ -60,7 +60,7 @@ describe("Stem Service", () => {
                     audio: "Test Audio 1",
                     user: "Test User 1",
                     name: "Test Name 1",
-                    trackId: "Test ID 1",
+                    genre: ["Trap"],
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                 }),
@@ -71,7 +71,7 @@ describe("Stem Service", () => {
                     audio: "Test Audio 2",
                     user: "Test User 2",
                     name: "Test Name 2",
-                    trackId: "Test ID 2",
+                    genre: ["Trap"],
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                 }),
@@ -83,139 +83,139 @@ describe("Stem Service", () => {
         });    
 
         // Act
-        const result: Stem[] = await stemService.getAllStems();
+        const result: Track[] = await trackService.getAllTracks();
 
         // Assert
-        expect(firestoreRepository.getDocuments).toHaveBeenCalledWith("stems");
+        expect(firestoreRepository.getDocuments).toHaveBeenCalledWith("tracks");
         expect(result[0]).toEqual(
             expect.objectContaining({
                 audio: "Test Audio 1",
                 user: "Test User 1",
                 name: "Test Name 1",
-                trackId: "Test ID 1",
+                genre: ["Trap"],
                 createdAt: expect.any(String),
                 updatedAt: expect.any(String),
             })
         );
     });
 
-    it("should retrieve one stem successfully", async () => {
+    it("should retrieve one track successfully", async () => {
         // Arrange
-        const mockDocumentId: string = "test-stem-id";
+        const mockDocumentId: string = "test-track-id";
         const mockStemData: {
             audio: string;
             user: string;
             name: string;
-            trackId: string;
+            genre: Array<"House" | "Trap" | "Dubstep" | "Hardstyle" | "Techno">;
         } = {
             audio: "Test Audio",
             user: "Test User",
             name: "Test Name",
-            trackId: "Test ID",
+            genre: ["Trap"],
 
         };
 
-        const mockStem = {
+        const mockTrack = {
             id: mockDocumentId,
             data: () => mockStemData,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
 
-        (firestoreRepository.getDocumentById as jest.Mock).mockResolvedValue(mockStem);
+        (firestoreRepository.getDocumentById as jest.Mock).mockResolvedValue(mockTrack);
 
         // Act
-        const result: Stem = await stemService.getStemById(mockDocumentId)
+        const result: Track = await trackService.getTrackById(mockDocumentId)
 
         // Assert
         expect(firestoreRepository.getDocumentById).toHaveBeenCalledWith(
-            "stems",
+            "tracks",
             mockDocumentId
         );
         expect(result.id).toBe(mockDocumentId);
         expect(result.user).toBe(mockStemData.user);
         expect(result.name).toBe(mockStemData.name);
-        expect(result.trackId).toBe(mockStemData.trackId);
+        expect(result.genre).toEqual(mockStemData.genre);
     });
 
-    it("should upload audio to a stem", async () => {
+    it("should upload audio to a track", async () => {
         // Arrange
-        const mockDocumentId: string = "test-stem-id";
-        const mockStem: Stem = {
+        const mockDocumentId: string = "test-track-id";
+        const mockTrack: Track = {
             id: mockDocumentId,
             audio: "Empty",
             user: "Test User 1",
             name: "Test Name 1",
-            trackId: "Test Track Id",
+            genre: ["Trap"],
             createdAt: "2025-11-17T03:09:43.614Z",
             updatedAt: new Date().toISOString(),
         };
 
-        jest.spyOn(stemService, "getStemById").mockResolvedValue(mockStem);
+        jest.spyOn(trackService, "getTrackById").mockResolvedValue(mockTrack);
+
 
         (firestoreRepository.updateDocument as jest.Mock).mockResolvedValue(
             mockDocumentId
         );
 
         // Act
-        await stemService.uploadAudioToStem(mockDocumentId, mockStem);
+        await trackService.uploadAudioToTrack(mockDocumentId, mockTrack);
 
         // Assert
-        expect(stemService.getStemById).toHaveBeenCalledWith(mockDocumentId);
+        expect(trackService.getTrackById).toHaveBeenCalledWith(mockDocumentId);
         expect(firestoreRepository.updateDocument).toHaveBeenCalledWith(
-            "stems",
+            "tracks",
             mockDocumentId,
-            mockStem,
+            mockTrack,
         );
     })
 
-    it("should update a stem successfully", async () => {
+    it("should update a track successfully", async () => {
         // Arrange
-        const mockDocumentId: string = "test-stem-id";
-        const mockStem: Stem = {
+        const mockDocumentId: string = "test-track-id";
+        const mockTrack: Track = {
             id: mockDocumentId,
             audio: "Test Audio 1",
             user: "Test User 1",
             name: "Test Name 1",
-            trackId: "Test ID 1",
+            genre: ["Trap"],
             createdAt: "2025-11-17T03:09:43.614Z",
             updatedAt: new Date().toISOString(),
         };
 
-        jest.spyOn(stemService, "getStemById").mockResolvedValue(mockStem);
+        jest.spyOn(trackService, "getTrackById").mockResolvedValue(mockTrack);
 
         (firestoreRepository.updateDocument as jest.Mock).mockResolvedValue(
             mockDocumentId
         );
 
         // Act
-        await stemService.updateStem(mockDocumentId, mockStem);
+        await trackService.updateTrack(mockDocumentId, mockTrack);
 
         // Assert
-        expect(stemService.getStemById).toHaveBeenCalledWith(mockDocumentId);
+        expect(trackService.getTrackById).toHaveBeenCalledWith(mockDocumentId);
         expect(firestoreRepository.updateDocument).toHaveBeenCalledWith(
-            "stems",
+            "tracks",
             mockDocumentId,
-            mockStem,
+            mockTrack,
         );
     });
 
-
-    it("should delete a stem successfully", async () => {
+    it("should delete a track successfully", async () => {
         // Arrange
         const mockDocumentId: string = "test-stem-id";
-        const mockStem: Stem = {
+        const mockTrack: Track = {
             id: mockDocumentId,
             audio: "Test Audio 1",
             user: "Test User 1",
             name: "Test Name 1",
-            trackId: "Test ID 1",
+            genre: ["Trap"],
             createdAt: "2025-11-17T03:09:43.614Z",
             updatedAt: "2025-11-17T03:09:43.614Z",
         };
 
         // jest.spyOn creates a mock for a specific method/function on an object, in our example the itemService
-        jest.spyOn(stemService, "getStemById").mockResolvedValue(mockStem);
+        jest.spyOn(trackService, "getTrackById").mockResolvedValue(mockTrack);
 
         // jest.Mock replaces the auto-mocked version with our specific mocked implementation
         (firestoreRepository.deleteDocument as jest.Mock).mockResolvedValue(
@@ -223,38 +223,38 @@ describe("Stem Service", () => {
         );
 
         // Act
-        await stemService.deleteStem(mockDocumentId);
+        await trackService.deleteTrack(mockDocumentId);
 
         // Assert
-        expect(stemService.getStemById).toHaveBeenCalledWith(mockDocumentId);
+        expect(trackService.getTrackById).toHaveBeenCalledWith(mockDocumentId);
         expect(firestoreRepository.deleteDocument).toHaveBeenCalledWith(
-            "stems",
+            "tracks",
             mockDocumentId
         );
     });
 
-    it("should delete audio from a stem successfully", async () => {
+    it("should delete audio from a track successfully", async () => {
         // Arrange
-        const mockDocumentId: string = "test-stem-id";
-        const mockTrack: Stem = {
+        const mockDocumentId: string = "test-track-id";
+        const mockTrack: Track = {
             id: mockDocumentId,
-            audio: "Test Audio",
-            user: "Test User",
-            name: "Test Name",
-            trackId: "Test Track Id",
+            audio: "Test Audio 1",
+            user: "Test User 1",
+            name: "Test Name 1",
+            genre: ["Trap"],
             createdAt: "2025-11-17T03:09:43.614Z",
             updatedAt: new Date().toISOString(),
         };
 
-        jest.spyOn(stemService, "getStemById").mockResolvedValue(mockTrack);
-        jest.spyOn(stemService, "deleteStemAudio");
+        jest.spyOn(trackService, "getTrackById").mockResolvedValue(mockTrack);
+        jest.spyOn(trackService, "deleteTrackAudio");
 
         // Act
-        await stemService.deleteStemAudio(mockDocumentId);
+        await trackService.deleteTrackAudio(mockDocumentId);
 
         // Assert
-        expect(stemService.getStemById).toHaveBeenCalledWith(mockDocumentId);
-        expect(stemService.deleteStemAudio).toHaveBeenCalledWith(
+        expect(trackService.getTrackById).toHaveBeenCalledWith(mockDocumentId);
+        expect(trackService.deleteTrackAudio).toHaveBeenCalledWith(
             mockDocumentId,
         );
     });

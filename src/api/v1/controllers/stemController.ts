@@ -16,7 +16,9 @@ export const createStem = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { audio, user, name, trackId } = req.body;
+        const { user, name, trackId } = req.body;
+
+        const audio: string = "Empty"
 
         const newStem: Stem = await stemService.createStem({
             audio,
@@ -102,7 +104,7 @@ export const uploadAudioToStem = async (
             audio: filePath
         });
 
-        res.status(HTTP_STATUS.CREATED).json(
+        res.status(HTTP_STATUS.OK).json(
             successResponse(uploadAudio, "Audio uploaded successfully.")
         );
     } catch (error: unknown) {
@@ -123,10 +125,9 @@ export const updateStem = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const { audio, user, name } = req.body;
+        const { user, name } = req.body;
 
         const updatedItem: Stem = await stemService.updateStem(id, {
-            audio,
             user,
             name, 
         });
@@ -153,6 +154,7 @@ export const deleteStem = async (
     try {
         const id: string = req.params.id;
 
+        await stemService.deleteStemAudio(id);
         await stemService.deleteStem(id);
         res.status(HTTP_STATUS.OK).json(
             successResponse("Stem deleted successfully.")
