@@ -78,6 +78,39 @@ export const getStemById = async (
 };
 
 /**
+ * Uploads an audio file to a track
+ * @param req - The express Request
+ * @param res  - The express Response
+ * @param next - The express middleware chaining function
+ */
+export const uploadAudioToStem = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const audio = req.file;
+
+        if (!audio) {
+            throw new Error("No audio file uploaded")
+        };
+
+        const filePath = `/uploads/stems/${audio.filename}`
+
+        const uploadAudio: Stem = await stemService.uploadAudioToStem(id, {
+            audio: filePath
+        });
+
+        res.status(HTTP_STATUS.CREATED).json(
+            successResponse(uploadAudio, "Audio uploaded successfully.")
+        );
+    } catch (error: unknown) {
+        next(error);
+    }
+}
+
+/**
  * Manages requests and responses to update one of the Stems
  * @param req - The express Request
  * @param res  - The express Response

@@ -11,6 +11,8 @@ import {
     updateDocument,
     deleteDocument,
 } from "../repositories/firestoreRepository";
+import fs from "fs";
+import path from "path";
 
 const COLLECTION: string = "stems";
 
@@ -26,7 +28,7 @@ export const createStem = async (stemData: {
     trackId: string;
 }): Promise<Stem> => {
     try {
-        const dateNow = new Date().toISOString();
+        const dateNow: string = new Date().toISOString();
         const newStem: Partial<Stem> = {
         ...stemData,
         createdAt: dateNow,
@@ -94,6 +96,40 @@ export const getStemById = async (id: string): Promise<Stem> => {
 };
 
 /**
+ * Uploads audio to an existing
+ * @param id - The ID of the track to update
+ * @param trackData - The fields to updates (audio)
+ * @returns The updated track
+ * @throws Error if track with given ID is not found
+ */
+export const uploadAudioToStem = async (
+    id: string,
+    trackData: Pick<Stem, "audio">
+): Promise<Stem> => {
+    try {
+        const track: Stem = await getStemById(id);
+        if (!track) {
+            throw new Error(`The stem with ID ${id} not found.`);
+        }
+
+        const uploadAudioToStem: Stem = {
+            ...track,
+            updatedAt: new Date().toISOString(),
+        };
+
+        if (trackData.audio !== undefined)
+            uploadAudioToStem.audio = trackData.audio
+
+        await updateDocument<Stem>(COLLECTION, id, uploadAudioToStem);
+
+        return structuredClone(uploadAudioToStem)
+
+    } catch (error: unknown) {
+        throw error;
+    }
+};
+
+/**
  * Updates one existing stem
  * @param id - The ID of one Stem to update
  * @param stemData _ The fields to update (audio, user)
@@ -143,6 +179,32 @@ export const deleteStem = async (id: string): Promise<void> => {
         }
 
         await deleteDocument(COLLECTION, id);
+    } catch (error: unknown) {
+        throw error;
+    }
+};
+
+/**
+ * Deletes the audio from the stem
+ * @param id - The ID of the track to stem the audio
+ * @throws Error if stem with given ID is not found
+ */
+export const deleteStemAudio = async (id: string): Promise<void> => {
+    try {
+        const track: Stem = await getStemById(id);
+        if (!track) {
+            throw new Error(`Track with ID ${id} not found.`);
+        }
+
+        const uploadPath = path.join(process.cwd(), "uploads");
+        
+        const files = fs.readdirSync(uploadPath);
+        for (const file of files) {
+            if (file.startsWith(id + '-')) {
+                const filePath = path.join(uploadPath, file)
+                fs.unlinkSync(filePath)
+            };
+        };
     } catch (error: unknown) {
         throw error;
     }

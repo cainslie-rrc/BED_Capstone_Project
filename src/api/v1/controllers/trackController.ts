@@ -16,7 +16,9 @@ export const createTrack = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { user, audio, name, genre } = req.body;
+        const { user, name, genre } = req.body;
+
+        const audio: string = "Empty"
 
         const newTrack: Track = await trackService.createTrack({
             user,
@@ -78,6 +80,39 @@ export const getTrackById = async (
 };
 
 /**
+ * Uploads an audio file to a track
+ * @param req - The express Request
+ * @param res  - The express Response
+ * @param next - The express middleware chaining function
+ */
+export const uploadAudioToTrack = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const audio = req.file;
+
+        if (!audio) {
+            throw new Error("No audio file uploaded")
+        };
+
+        const filePath = `/uploads/tracks/${audio.filename}`
+
+        const uploadAudio: Track = await trackService.uploadAudioToTrack(id, {
+            audio: filePath
+        });
+
+        res.status(HTTP_STATUS.CREATED).json(
+            successResponse(uploadAudio, "Audio uploaded successfully.")
+        );
+    } catch (error: unknown) {
+        next(error);
+    }
+}
+
+/**
  * Manages requests and responses to update a Track
  * @param req - The express Request
  * @param res  - The express Response
@@ -90,10 +125,10 @@ export const updateTrack = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const { audio } = req.body;
+        const { name } = req.body;
 
         const updateTrack: Track = await trackService.updateTrack(id, {
-            audio
+            name
         });
 
         res.status(HTTP_STATUS.OK).json(
@@ -118,6 +153,7 @@ export const deleteTrack = async (
     try {
         const id: string = req.params.id;
 
+        await trackService.deleteTrackAudio(id);
         await trackService.deleteTrack(id);
         res.status(HTTP_STATUS.OK).json(
             successResponse("Track deleted successfully.")
