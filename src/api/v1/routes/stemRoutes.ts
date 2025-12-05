@@ -3,6 +3,9 @@ import { validateRequest } from "../middleware/validate";
 import { upload } from "../../../../config/multerConfig";
 import { stemSchema } from "../validations/stemValidation"
 import * as stemController from "../controllers/stemController";
+import authenticate from "../middleware/authenticate";
+import isAuthorized from "../middleware/authorize";
+import { AuthorizationOptions } from "../models/authorizationOptions";
 
 const router: Router = express.Router();
 
@@ -48,9 +51,12 @@ const router: Router = express.Router();
  */
 router.post(
     "/",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user", "user-with-access"] } as AuthorizationOptions),
     validateRequest(stemSchema.create),
     stemController.createStem
 );
+
 
 /**
  * @openapi
@@ -95,7 +101,11 @@ router.get("/", stemController.getAllStems);
  *             schema:
  *               $ref: '#/components/schemas/Stem'
  */
-router.get("/:id", stemController.getStemById);
+router.get(
+    "/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user", "user-with-access"] } as AuthorizationOptions),
+    stemController.getStemById);
 
 /**
  * @openapi
@@ -143,6 +153,8 @@ router.get("/:id", stemController.getStemById);
  */
 router.put(
     "/:id/audio",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user", "user-with-access"] } as AuthorizationOptions),
     validateRequest(stemSchema.uploadAudio),
     upload.single("audio"),
     stemController.uploadAudioToStem
@@ -197,6 +209,8 @@ router.put(
  */
 router.put(
     "/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user", "user-with-access"] } as AuthorizationOptions),
     validateRequest(stemSchema.update),
     stemController.updateStem
 );
@@ -220,6 +234,10 @@ router.put(
  *       200:
  *         description: Stem deleted successfully
  */
-router.delete("/:id", stemController.deleteStem);
+router.delete(
+    "/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user"] } as AuthorizationOptions),
+    stemController.deleteStem);
 
 export default router;

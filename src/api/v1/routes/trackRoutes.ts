@@ -3,6 +3,9 @@ import { validateRequest } from "../middleware/validate";
 import { upload } from "../../../../config/multerConfig";
 import { trackSchemas } from "../validations/trackValidation";
 import * as trackController from "../controllers/trackController";
+import authenticate from "../middleware/authenticate";
+import isAuthorized from "../middleware/authorize";
+import { AuthorizationOptions } from "../models/authorizationOptions";
 
 const router: Router = express.Router();
 
@@ -49,10 +52,13 @@ const router: Router = express.Router();
  *               $ref: '#/components/schemas/Track'
  */
 router.post(
-    "/",
+    "/", 
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user"] } as AuthorizationOptions),
     validateRequest(trackSchemas.create),
     trackController.createTrack
 );
+
 
 /**
  * @openapi
@@ -97,7 +103,11 @@ router.get("/", trackController.getAllTracks);
  *             schema:
  *               $ref: '#/components/schemas/Track'
  */
-router.get("/:id", trackController.getTrackById);
+router.get(
+    "/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user", "user-with-access"] } as AuthorizationOptions),
+    trackController.getTrackById);
 
 /**
  * @openapi
@@ -148,6 +158,8 @@ router.get("/:id", trackController.getTrackById);
  */
 router.put(
     "/:id/audio",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user", "user-with-access"] } as AuthorizationOptions),
     validateRequest(trackSchemas.uploadAudio),
     upload.single("audio"),
     trackController.uploadAudioToTrack
@@ -203,6 +215,8 @@ router.put(
  */
 router.put(
     "/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user", "user-with-access"] } as AuthorizationOptions),
     validateRequest(trackSchemas.update),
     trackController.updateTrack
 );
@@ -226,6 +240,9 @@ router.put(
  *       200:
  *         description: Track deleted successfully
  */
-router.delete("/:id", trackController.deleteTrack);
+router.delete("/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin", "user"] } as AuthorizationOptions),
+    trackController.deleteTrack);
 
 export default router;
