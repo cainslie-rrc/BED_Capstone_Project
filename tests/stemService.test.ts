@@ -138,39 +138,38 @@ describe("Stem Service", () => {
         expect(result.trackId).toBe(mockStemData.trackId);
     });
 
-    // it("should update a stem successfully", async () => {
-    //     // Arrange
-    //     const mockDocumentId: string = "test-stem-id";
-    //     const mockStem: Stem = {
-    //         id: mockDocumentId,
-    //         audio: "Test Audio 1",
-    //         user: "Test User 1",
-    //         name: "Test Name 1",
-    //         trackId: "Test ID 1",
-    //         createdAt: expect.any(String),
-    //         updatedAt: expect.any(String),
-    //     };
+    it("should upload audio to a stem", async () => {
+        // Arrange
+        const mockDocumentId: string = "test-stem-id";
+        const mockStem: Stem = {
+            id: mockDocumentId,
+            audio: "Empty",
+            user: "Test User 1",
+            name: "Test Name 1",
+            trackId: "Test Track Id",
+            createdAt: "2025-11-17T03:09:43.614Z",
+            updatedAt: new Date().toISOString(),
+        };
 
-    //     jest.spyOn(stemService, "getStemById").mockResolvedValue(mockStem);
+        jest.spyOn(stemService, "getStemById").mockResolvedValue(mockStem);
 
-    //     (firestoreRepository.updateDocument as jest.Mock).mockResolvedValue(
-    //         mockDocumentId
-    //     );
+        (firestoreRepository.updateDocument as jest.Mock).mockResolvedValue(
+            mockDocumentId
+        );
 
-    //     // Act
-    //     await stemService.updateStem(mockDocumentId, mockStem);
+        // Act
+        await stemService.uploadAudioToStem(mockDocumentId, mockStem);
 
-    //     // Assert
-    //     expect(stemService.getStemById).toHaveBeenCalledWith(mockDocumentId);
-    //     expect(firestoreRepository.updateDocument).toHaveBeenCalledWith(
-    //         "stems",
-    //         mockDocumentId,
-    //         mockStem,
-    //     );
-    // });
+        // Assert
+        expect(stemService.getStemById).toHaveBeenCalledWith(mockDocumentId);
+        expect(firestoreRepository.updateDocument).toHaveBeenCalledWith(
+            "stems",
+            mockDocumentId,
+            mockStem,
+        );
+    })
 
-
-    it("should delete an stems successfully", async () => {
+    it("should update a stem successfully", async () => {
         // Arrange
         const mockDocumentId: string = "test-stem-id";
         const mockStem: Stem = {
@@ -179,8 +178,40 @@ describe("Stem Service", () => {
             user: "Test User 1",
             name: "Test Name 1",
             trackId: "Test ID 1",
-            createdAt: expect.any(String),
-            updatedAt: expect.any(String),
+            createdAt: "2025-11-17T03:09:43.614Z",
+            updatedAt: new Date().toISOString(),
+        };
+
+        jest.spyOn(stemService, "getStemById").mockResolvedValue(mockStem);
+
+        (firestoreRepository.updateDocument as jest.Mock).mockResolvedValue(
+            mockDocumentId
+        );
+
+        // Act
+        await stemService.updateStem(mockDocumentId, mockStem);
+
+        // Assert
+        expect(stemService.getStemById).toHaveBeenCalledWith(mockDocumentId);
+        expect(firestoreRepository.updateDocument).toHaveBeenCalledWith(
+            "stems",
+            mockDocumentId,
+            mockStem,
+        );
+    });
+
+
+    it("should delete a stem successfully", async () => {
+        // Arrange
+        const mockDocumentId: string = "test-stem-id";
+        const mockStem: Stem = {
+            id: mockDocumentId,
+            audio: "Test Audio 1",
+            user: "Test User 1",
+            name: "Test Name 1",
+            trackId: "Test ID 1",
+            createdAt: "2025-11-17T03:09:43.614Z",
+            updatedAt: "2025-11-17T03:09:43.614Z",
         };
 
         // jest.spyOn creates a mock for a specific method/function on an object, in our example the itemService
@@ -199,6 +230,32 @@ describe("Stem Service", () => {
         expect(firestoreRepository.deleteDocument).toHaveBeenCalledWith(
             "stems",
             mockDocumentId
+        );
+    });
+
+    it("should delete audio from a stem successfully", async () => {
+        // Arrange
+        const mockDocumentId: string = "test-stem-id";
+        const mockTrack: Stem = {
+            id: mockDocumentId,
+            audio: "Test Audio",
+            user: "Test User",
+            name: "Test Name",
+            trackId: "Test Track Id",
+            createdAt: "2025-11-17T03:09:43.614Z",
+            updatedAt: new Date().toISOString(),
+        };
+
+        jest.spyOn(stemService, "getStemById").mockResolvedValue(mockTrack);
+        jest.spyOn(stemService, "deleteStemAudio");
+
+        // Act
+        await stemService.deleteStemAudio(mockDocumentId);
+
+        // Assert
+        expect(stemService.getStemById).toHaveBeenCalledWith(mockDocumentId);
+        expect(stemService.deleteStemAudio).toHaveBeenCalledWith(
+            mockDocumentId,
         );
     });
 });

@@ -4,10 +4,12 @@ import {
     getApps,
     ServiceAccount,
     AppOptions,
-    App
+    App,
 } from "firebase-admin/app";
 import { getFirestore, Firestore } from "firebase-admin/firestore";
 import { getAuth, Auth } from "firebase-admin/auth";
+// import { getStorage, Storage } from "firebase-admin/storage";
+// import { Bucket } from "node_modules/@google-cloud/storage/build/cjs/src";
 
 /**
  * Retrieves Firebase configuration from environment variables
@@ -40,6 +42,7 @@ const getFirebaseConfig = (): AppOptions => {
 
     return {
         credential: cert(serviceAccount),
+        storageBucket: `${FIREBASE_PROJECT_ID}.appspot.com`,
     };
 };
 
@@ -69,5 +72,8 @@ const auth: Auth = getAuth(firebaseApp);
 
 // get a reference to the firestore database
 const db: Firestore = getFirestore(firebaseApp);
+
+// const storage: Storage = getStorage(firebaseApp);
+// const bucket: Bucket = storage.bucket();
 
 export { auth, db };

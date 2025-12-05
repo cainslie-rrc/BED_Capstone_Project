@@ -16,7 +16,9 @@ export const createStem = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { audio, user, name, trackId } = req.body;
+        const { user, name, trackId } = req.body;
+
+        const audio: string = "Empty"
 
         const newStem: Stem = await stemService.createStem({
             audio,
@@ -78,6 +80,39 @@ export const getStemById = async (
 };
 
 /**
+ * Uploads an audio file to a track
+ * @param req - The express Request
+ * @param res  - The express Response
+ * @param next - The express middleware chaining function
+ */
+export const uploadAudioToStem = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const audio = req.file;
+
+        if (!audio) {
+            throw new Error("No audio file uploaded")
+        };
+
+        const filePath = `/uploads/stems/${audio.filename}`
+
+        const uploadAudio: Stem = await stemService.uploadAudioToStem(id, {
+            audio: filePath
+        });
+
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(uploadAudio, "Audio uploaded successfully.")
+        );
+    } catch (error: unknown) {
+        next(error);
+    }
+}
+
+/**
  * Manages requests and responses to update one of the Stems
  * @param req - The express Request
  * @param res  - The express Response
@@ -90,10 +125,9 @@ export const updateStem = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const { audio, user, name } = req.body;
+        const { user, name } = req.body;
 
         const updatedItem: Stem = await stemService.updateStem(id, {
-            audio,
             user,
             name, 
         });
@@ -120,6 +154,7 @@ export const deleteStem = async (
     try {
         const id: string = req.params.id;
 
+        await stemService.deleteStemAudio(id);
         await stemService.deleteStem(id);
         res.status(HTTP_STATUS.OK).json(
             successResponse("Stem deleted successfully.")
