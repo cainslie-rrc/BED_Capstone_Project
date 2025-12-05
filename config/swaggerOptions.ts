@@ -7,10 +7,10 @@ const swaggerOptions: Options = {
     definition: {
         openapi: "3.1.0",
         info: {
-            title: "Assignment 5 API Documentation",
+            title: "Capstone Project API Documentation",
             version: "1.0.0",
             description:
-                "This is the API documentation for Assignment 5",
+                "This is the API documentation for Capstone Project",
         },
         servers: [
             {

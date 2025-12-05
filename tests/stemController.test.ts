@@ -132,7 +132,7 @@ describe("Stem Controller", () => {
                     buffer: Buffer.from('mock audio content'),
                     stream: null as any,
                 };
-    
+
                 const mockStem: Stem = {
                     id: "Test Id",
                     audio: "uploads/26nQPYdzJKv7iiigjAPl-Wyth - Hands Up!.mp3",
