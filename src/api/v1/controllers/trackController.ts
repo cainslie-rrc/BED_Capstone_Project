@@ -104,7 +104,7 @@ export const uploadAudioToTrack = async (
             audio: filePath
         });
 
-        res.status(HTTP_STATUS.CREATED).json(
+        res.status(HTTP_STATUS.OK).json(
             successResponse(uploadAudio, "Audio uploaded successfully.")
         );
     } catch (error: unknown) {

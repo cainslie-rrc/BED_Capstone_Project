@@ -7,6 +7,7 @@ jest.mock("../src/api/v1/controllers/trackController", () => ({
     createTrack: jest.fn((req, res) => res.status(HTTP_STATUS.CREATED).send()),
     getAllTracks: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
     getTrackById: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
+    uploadAudioToTrack: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
     updateTrack: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
     deleteTrack: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
 }));
@@ -21,9 +22,8 @@ describe("Track Routes", () => {
             const mockTrack = {
                 id: "Test Id",
                 user: "Test User",
-                audio: "Test Audio",
                 name: "Test Name",
-                genre: "House",
+                genre: ["House"],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
             }; 
@@ -47,10 +47,21 @@ describe("Track Routes", () => {
         });
     });
 
+    describe("PUT /api/v1/tracks/:id/audio", () => {
+        it("should call uploadAudioToTrack controller with valid data", async () => {
+            const mockStem = {
+                audio: "uploads/tracks/test_audio.mp3",
+            };
+
+            await request(app).put("/api/v1/tracks/1/audio").send(mockStem);
+            expect(trackController.uploadAudioToTrack).toHaveBeenCalled();
+        });
+    });
+
     describe("PUT /api/v1/tracks/:id", () => {
         it("should call updateTrack controller with valid data", async () => {
             const mockTrack = {
-                audio: "Test Audio",
+                name: "Test Name",
             };
 
             await request(app).put("/api/v1/tracks/1").send(mockTrack);

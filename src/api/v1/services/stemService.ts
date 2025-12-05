@@ -138,7 +138,7 @@ export const uploadAudioToStem = async (
  */
 export const updateStem = async (
     id: string,
-    stemData: Pick<Stem, "audio" | "user" | "name">
+    stemData: Pick<Stem, "user" | "name">
 ): Promise<Stem> => {
     try {
         const stem: Stem = await getStemById(id);
@@ -151,8 +151,6 @@ export const updateStem = async (
             updatedAt: new Date().toISOString(),
         };
 
-        if (stemData.audio !== undefined) 
-            updateStem.audio = stemData.audio;
         if (stemData.user !== undefined)
             updateStem.user = stemData.user;
         if (stemData.name !== undefined)
@@ -193,7 +191,7 @@ export const deleteStemAudio = async (id: string): Promise<void> => {
     try {
         const track: Stem = await getStemById(id);
         if (!track) {
-            throw new Error(`Track with ID ${id} not found.`);
+            throw new Error(`Stem with ID ${id} not found.`);
         }
 
         const uploadPath = path.join(process.cwd(), "uploads");
