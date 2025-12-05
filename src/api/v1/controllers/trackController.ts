@@ -98,7 +98,7 @@ export const uploadAudioToTrack = async (
             throw new Error("No audio file uploaded")
         };
 
-        const filePath = `/uploads/track/${audio.filename}`
+        const filePath = `/uploads/tracks/${audio.filename}`
 
         const uploadAudio: Track = await trackService.uploadAudioToTrack(id, {
             audio: filePath

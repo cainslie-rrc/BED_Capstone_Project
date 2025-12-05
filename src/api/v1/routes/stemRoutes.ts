@@ -1,4 +1,7 @@
 import express, { Router } from "express";
+import { validateRequest } from "../middleware/validate";
+import { upload } from "../../../../config/multerConfig";
+import { stemSchema } from "../validations/stemValidation"
 import * as stemController from "../controllers/stemController";
 
 const router: Router = express.Router();
@@ -43,7 +46,11 @@ const router: Router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/Stem'
  */
-router.post("/", stemController.createStem);
+router.post(
+    "/",
+    validateRequest(stemSchema.create),
+    stemController.createStem
+);
 
 /**
  * @openapi
@@ -92,6 +99,57 @@ router.get("/:id", stemController.getStemById);
 
 /**
  * @openapi
+ * /tracks/{id}:
+ *   put:
+ *     summary: Upload audio to a Stem
+ *     tags: [Stems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "t4svjhio3uy2hv9h2356"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - audio
+ *             properties:
+ *               user:
+ *                 type: string
+ *                 example: "John Doe"
+ *               audio:
+ *                 type: string
+ *                 example: "/uploads/tracks/108u351u9r130139-exodia_drums.mp3"
+ *               name:
+ *                 type: string
+ *                 example: "Updated Track Name"
+ *               trackId:
+ *                 type: string
+ *                 example: "3u9ufg9458230-4852vdefg"
+ *     responses:
+ *       200:
+ *         description: Stem updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Stem'
+ */
+router.put(
+    "/:id/audio",
+    validateRequest(stemSchema.uploadAudio),
+    upload.single("audio"),
+    stemController.uploadAudioToStem
+);
+
+/**
+ * @openapi
  * /stems/{id}:
  *   put:
  *     summary: Update a Stem
@@ -137,7 +195,11 @@ router.get("/:id", stemController.getStemById);
  *             schema:
  *               $ref: '#/components/schemas/Stem'
  */
-router.put("/:id", stemController.updateStem);
+router.put(
+    "/:id",
+    validateRequest(stemSchema.update),
+    stemController.updateStem
+);
 
 /**
  * @openapi
