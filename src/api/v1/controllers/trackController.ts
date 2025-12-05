@@ -79,6 +79,12 @@ export const getTrackById = async (
     }
 };
 
+/**
+ * Uploads an audio file to a track
+ * @param req - The express Request
+ * @param res  - The express Response
+ * @param next - The express middleware chaining function
+ */
 export const uploadAudioToTrack = async (
     req: Request,
     res: Response,
@@ -89,9 +95,8 @@ export const uploadAudioToTrack = async (
         const audio = req.file;
 
         if (!audio) {
-            res.status(400).json({ message: "No audio file uploaded" });
-            return;
-        }
+            throw new Error("No audio file uploaded")
+        };
 
         const filePath = `/uploads/track/${audio.filename}`
 
