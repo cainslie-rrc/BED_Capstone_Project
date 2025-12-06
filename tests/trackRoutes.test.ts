@@ -1,4 +1,5 @@
 import request from "supertest";
+import { Request, Response, NextFunction } from "express";
 import app from "../src/app";
 import { HTTP_STATUS } from "../src/constants/httpConstants";
 import * as trackController from "../src/api/v1/controllers/trackController";
@@ -11,6 +12,19 @@ jest.mock("../src/api/v1/controllers/trackController", () => ({
     updateTrack: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
     deleteTrack: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
 }));
+
+jest.mock("../src/api/v1/middleware/authenticate", () => {
+    return jest.fn((_req: Request, _res: Response, next: NextFunction) =>
+        next()
+    );
+});
+
+jest.mock("../src/api/v1/middleware/authorize", () => {
+    return jest.fn(
+        (_mockOptions) => (_req: Request, _res: Response, next: NextFunction) =>
+            next()
+    );
+});
 
 describe("Track Routes", () => {
     afterEach(() => {
@@ -28,7 +42,10 @@ describe("Track Routes", () => {
                 updatedAt: new Date().toISOString(),
             }; 
 
-            await request(app).post("/api/v1/tracks/").send(mockTrack);
+            await request(app)
+            .post("/api/v1/tracks/")
+            .set("Authorization", "Bearer mockedToken")
+            .send(mockTrack);
             expect(trackController.createTrack).toHaveBeenCalled();
         });
     });
@@ -53,7 +70,10 @@ describe("Track Routes", () => {
                 audio: "uploads/tracks/test_audio.mp3",
             };
 
-            await request(app).put("/api/v1/tracks/1/audio").send(mockStem);
+            await request(app)
+            .put("/api/v1/tracks/1/audio")
+            .set("Authorization", "Bearer mockedToken")
+            .send(mockStem);
             expect(trackController.uploadAudioToTrack).toHaveBeenCalled();
         });
     });
@@ -64,14 +84,19 @@ describe("Track Routes", () => {
                 name: "Test Name",
             };
 
-            await request(app).put("/api/v1/tracks/1").send(mockTrack);
+            await request(app)
+            .put("/api/v1/tracks/1")
+            .set("Authorization", "Bearer mockedToken")
+            .send(mockTrack);
             expect(trackController.updateTrack).toHaveBeenCalled();
         });
     });
 
     describe("DELETE /api/v1/tracks/:id", () => {
         it("should call deleteTrack controller with valid data", async () => {
-            await request(app).delete("/api/v1/tracks/1");
+            await request(app)
+            .delete("/api/v1/tracks/1")
+            .set("Authorization", "Bearer mockedToken")
             expect(trackController.deleteTrack).toHaveBeenCalled();
         });
     });

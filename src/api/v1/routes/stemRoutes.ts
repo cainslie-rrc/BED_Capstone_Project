@@ -109,7 +109,7 @@ router.get(
 
 /**
  * @openapi
- * /tracks/{id}:
+ * /stems/{id}/audio:
  *   put:
  *     summary: Upload audio to a Stem
  *     tags: [Stems]

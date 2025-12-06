@@ -111,7 +111,7 @@ router.get(
 
 /**
  * @openapi
- * /tracks/{id}:
+ * /tracks/{id}/audio:
  *   put:
  *     summary: Upload audio to a Track
  *     tags: [Tracks]

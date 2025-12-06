@@ -1,4 +1,5 @@
 import request from "supertest";
+import { Request, Response, NextFunction } from "express";
 import app from "../src/app";
 import { HTTP_STATUS } from "../src/constants/httpConstants";
 import * as stemController from "../src/api/v1/controllers/stemController"
@@ -11,6 +12,19 @@ jest.mock("../src/api/v1/controllers/stemController", () => ({
     updateStem: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
     deleteStem: jest.fn((req, res) => res.status(HTTP_STATUS.OK).send()),
 }));
+
+jest.mock("../src/api/v1/middleware/authenticate", () => {
+    return jest.fn((_req: Request, _res: Response, next: NextFunction) =>
+        next()
+    );
+});
+
+jest.mock("../src/api/v1/middleware/authorize", () => {
+    return jest.fn(
+        (_mockOptions) => (_req: Request, _res: Response, next: NextFunction) =>
+            next()
+    );
+});
 
 describe("Stem Routes", () => {
     afterEach(() => {
@@ -26,9 +40,12 @@ describe("Stem Routes", () => {
                 trackId: "Test TrackId",
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
-            }; 
+            };
 
-            await request(app).post("/api/v1/stems/").send(mockStem);
+            await request(app)
+            .post("/api/v1/stems/")
+            .set("Authorization", "Bearer mockedToken")
+            .send(mockStem);
             expect(stemController.createStem).toHaveBeenCalled();
         });
     });
@@ -53,7 +70,10 @@ describe("Stem Routes", () => {
                 audio: "uploads/stems/test_audio.mp3",
             };
 
-            await request(app).put("/api/v1/stems/1/audio").send(mockStem);
+            await request(app)
+            .put("/api/v1/stems/1/audio")
+            .set("Authorization", "Bearer mockedToken")
+            .send(mockStem);
             expect(stemController.uploadAudioToStem).toHaveBeenCalled();
         });
     });
@@ -65,14 +85,19 @@ describe("Stem Routes", () => {
                 name: "Test Name",
             };
 
-            await request(app).put("/api/v1/stems/1").send(mockStem);
+            await request(app)
+            .put("/api/v1/stems/1")
+            .set("Authorization", "Bearer mockedToken")
+            .send(mockStem);
             expect(stemController.updateStem).toHaveBeenCalled();
         });
     });
 
     describe("DELETE /api/v1/stems/:id", () => {
         it("should call deleteStem controller with valid data", async () => {
-            await request(app).delete("/api/v1/stems/1");
+            await request(app)
+            .delete("/api/v1/stems/1")
+            .set("Authorization", "Bearer mockedToken");
             expect(stemController.deleteStem).toHaveBeenCalled();
         });
     });
